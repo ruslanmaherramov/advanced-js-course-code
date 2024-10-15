@@ -8,17 +8,17 @@
  */
 
 class Game {
-  constructor(player1, player2, width = 7, height = 6) {
+  constructor(player1, player2, height = 6, width = 7) {
     this.players = [player1, player2];
-    this.width = width;
     this.height = height;
+    this.width = width;
     this.currPlayer = player1;
     this.makeBoard();
     this.makeHtmlBoard();
     this.gameOver = false;
   }
 
-  /** makeBoard: fill in global `board`:
+  /** makeBoard: create in-JS board structure:
    *    board = array of rows, each row is array of cells  (board[y][x])
    */
 
@@ -36,6 +36,7 @@ class Game {
     const board = document.getElementById("board");
     board.innerHTML = '';
 
+    // make column tops (clickable area for adding a piece to that column)
     const top = document.createElement("tr");
     top.setAttribute("id", "column-top");
 
@@ -47,9 +48,7 @@ class Game {
     }
     board.append(top);
 
-    // dynamically creates the main part of html board
-    // uses height to create table rows
-    // uses width to create table cells for each row
+    // make main part of board
     for (let y = 0; y < this.height; y++) {
       const row = document.createElement('tr');
 
@@ -63,8 +62,7 @@ class Game {
     }
   }
 
-  /** findSpotForCol: given column x, return y coordinate of furthest-down spot
-   *    (return null if filled) */
+  /** findSpotForCol: given column x, return top empty y (null if filled) */
 
   findSpotForCol(x) {
     for (let y = this.height - 1; y >= 0; y--) {
@@ -93,10 +91,6 @@ class Game {
   }
 
   #win(cells) {
-    // Check four cells to see if they're all color of current player
-    //  - cells: list of four (y, x) cells
-    //  - returns true if all are legal coordinates & all match currPlayer
-
     return cells.every(
       ([y, x]) =>
         y >= 0 &&
@@ -110,6 +104,9 @@ class Game {
   /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
   checkForWin() {
+    // Check four cells to see if they're all color of current player
+    //  - cells: list of four (y, x) cells
+    //  - returns true if all are legal coordinates & all match currPlayer
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
@@ -129,9 +126,15 @@ class Game {
     return false;
   }
 
-  /** handleClick: handle click of column top to play piece */
+  /** handleClick: handle click of column top to play piece
+   *
+   * Prevent additional moves here if game over:
+   * In handleClick, check gameOver property and if false, return to ignore click
+   *
+   */
 
   handleClick(evt) {
+    // If game is over, ignore click to prevent additional moves
     if (this.gameOver) {
       return;
     }
@@ -165,6 +168,10 @@ class Game {
     this.currPlayer = this.currPlayer === this.players[0] ? this.players[1] : this.players[0];
   }
 }
+
+/** Player class:
+ *   - color: CSS color for their pieces
+ */
 
 class Player {
   constructor(color) {
