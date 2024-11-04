@@ -15,6 +15,8 @@ async function demo() {
   console.log(val);
 }
 
+demo();
+
 // with .then() method
 wait(5000).then((val) => console.log(val));
 
